@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Liderlik')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <div class="eyebrow" style="margin-bottom:8px">Liderlik</div>
+        <h1 style="margin:0">Sıralama</h1>
+        <p class="text-muted" style="margin:6px 0 0">En yüksek skora göre — eşitlikte daha kısa süre kazanır.</p>
+    </section>
+
+    <section>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(topAttempts)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th style="width:60px">Sıra</th>
+                    <th>Oyuncu</th>
+                    <th>Quiz</th>
+                    <th>Skor</th>
+                    <th>Süre</th>
+                    <th>Tarih</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a, it : ${topAttempts}">
+                    <td>
+                        <span th:if="${it.index == 0}" style="font-size:1.4rem">🥇</span>
+                        <span th:if="${it.index == 1}" style="font-size:1.4rem">🥈</span>
+                        <span th:if="${it.index == 2}" style="font-size:1.4rem">🥉</span>
+                        <span th:if="${it.index > 2}" th:text="${it.index + 1}">4</span>
+                    </td>
+                    <td>
+                        <div class="row gap-1">
+                            <span class="avatar" th:text="${a.user.displayName.substring(0,1).toUpperCase()}">A</span>
+                            <span th:text="${a.user.displayName}">Kullanıcı</span>
+                        </div>
+                    </td>
+                    <td th:text="${a.quiz.title}">Quiz</td>
+                    <td>
+                        <span class="badge badge-success"
+                              th:text="${a.score} + '/' + ${a.totalQuestions} + ' (' + ${a.percentage} + '%)'">100%</span>
+                    </td>
+                    <td th:text="${a.durationSeconds} + ' sn'">0 sn</td>
+                    <td th:text="${#temporals.format(a.takenAt, 'dd.MM.yyyy HH:mm')}">--</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${#lists.isEmpty(topAttempts)}" class="card text-center">
+            <p class="text-muted">Henüz hiç quiz çözülmedi. İlk olan sen ol!</p>
+            <a th:href="@{/quiz}" class="btn btn-primary">Quiz Çöz</a>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

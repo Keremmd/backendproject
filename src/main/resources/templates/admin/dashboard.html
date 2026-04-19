@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Yönetim')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <div class="eyebrow" style="margin-bottom:8px">Yönetim</div>
+        <h1 style="margin:0">Genel bakış</h1>
+        <p class="text-muted" style="margin:6px 0 0">Sistem geneli özet ve hızlı eylemler.</p>
+    </section>
+
+    <section>
+        <div class="card-grid">
+            <div class="stat"><span class="label">Kategori</span><span class="value" th:text="${categoryCount}">0</span></div>
+            <div class="stat"><span class="label">Quiz</span><span class="value" th:text="${quizCount}">0</span></div>
+            <div class="stat"><span class="label">Soru</span><span class="value" th:text="${questionCount}">0</span></div>
+            <div class="stat"><span class="label">Kullanıcı</span><span class="value" th:text="${userCount}">0</span></div>
+            <div class="stat"><span class="label">Deneme</span><span class="value" th:text="${attemptCount}">0</span></div>
+        </div>
+    </section>
+
+    <section>
+        <div class="card-grid">
+            <a th:href="@{/admin/categories}" class="card" style="color:inherit; text-decoration:none">
+                <h3>Kategoriler</h3>
+                <p class="text-muted">Kategorileri ekle, düzenle, sil.</p>
+                <span class="text-muted" style="font-size:.85rem">Yönet →</span>
+            </a>
+            <a th:href="@{/admin/quizzes}" class="card" style="color:inherit; text-decoration:none">
+                <h3>Quizler & Sorular</h3>
+                <p class="text-muted">Quiz oluştur, sorularını ekle/güncelle.</p>
+                <span class="text-muted" style="font-size:.85rem">Yönet →</span>
+            </a>
+            <a th:href="@{/admin/attempts}" class="card" style="color:inherit; text-decoration:none">
+                <h3>Kullanıcı Sonuçları</h3>
+                <p class="text-muted">Tüm denemelere göz at.</p>
+                <span class="text-muted" style="font-size:.85rem">İncele →</span>
+            </a>
+            <a th:href="@{/admin/users}" class="card" style="color:inherit; text-decoration:none">
+                <h3>Kullanıcılar</h3>
+                <p class="text-muted">Kayıtlı kullanıcıların listesi.</p>
+                <span class="text-muted" style="font-size:.85rem">Listele →</span>
+            </a>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title"><h2>Son Denemeler</h2></div>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(recentAttempts)}">
+            <table class="table">
+                <thead>
+                <tr><th>Kullanıcı</th><th>Quiz</th><th>Skor</th><th>Tarih</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${recentAttempts}">
+                    <td th:text="${a.user.displayName}">--</td>
+                    <td th:text="${a.quiz.title}">--</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${a.percentage >= 70} ? 'badge-success' : (${a.percentage < 50} ? 'badge-danger' : '')"
+                              th:text="${a.score} + '/' + ${a.totalQuestions} + ' (' + ${a.percentage} + '%)'">--</span>
+                    </td>
+                    <td th:text="${#temporals.format(a.takenAt, 'dd.MM.yyyy HH:mm')}">--</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p th:if="${#lists.isEmpty(recentAttempts)}" class="text-muted">Henüz veri yok.</p>
+    </section>
+
+</th:block>
+</body>
+</html>

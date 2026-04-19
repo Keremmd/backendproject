@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, ${quiz.title})}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <a th:href="@{/quiz}" class="text-muted" style="font-size:.9rem">← Tüm quizler</a>
+    </section>
+
+    <section class="hero" style="padding:48px 40px">
+        <div class="hero-inner">
+            <span class="badge">
+                <span th:text="${quiz.category.icon}">📚</span>
+                <span th:text="${quiz.category.name}">Kategori</span>
+            </span>
+            <h1 class="mt-2" th:text="${quiz.title}">Quiz başlığı</h1>
+            <p th:text="${quiz.description}">Açıklama</p>
+
+            <div class="row gap-2 mt-2">
+                <span class="badge badge-muted">📋 <span th:text="${#lists.size(quiz.questions)} + ' soru'">5</span></span>
+                <span class="badge badge-muted">⏱ <span th:text="${quiz.timeLimitSeconds / 60} + ' dakika'">5</span></span>
+            </div>
+
+            <div class="hero-actions mt-3">
+                <a th:href="@{|/quiz/${quiz.id}/take|}" class="btn btn-primary btn-lg"
+                   th:if="${!#lists.isEmpty(quiz.questions)}">Quizi Başlat →</a>
+                <span th:if="${#lists.isEmpty(quiz.questions)}" class="text-muted">Bu quizin henüz sorusu yok.</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="card-grid">
+            <div class="card">
+                <h3>📝 Nasıl çalışır?</h3>
+                <p class="text-muted">Quizi başlattığında geri sayım sayacı çalışmaya başlar. Süre dolduğunda
+                    cevapların otomatik olarak gönderilir.</p>
+            </div>
+            <div class="card">
+                <h3>📊 Sonuçlar</h3>
+                <p class="text-muted">Her sorunun doğru cevabı sonuç sayfasında gösterilir. Performans grafiğinle
+                    nerede güçlü olduğunu hemen görürsün.</p>
+            </div>
+            <div class="card">
+                <h3>🏆 Liderlik</h3>
+                <p class="text-muted">En yüksek skoruna göre liderlik tablosunda yerini alırsın. Eşitlik durumunda
+                    daha hızlı bitiren önde olur.</p>
+            </div>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

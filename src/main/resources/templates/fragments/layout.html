@@ -1,0 +1,72 @@
+<!--
+  Ortak layout fragmanı.
+  Sayfalar `th:replace="~{fragments/layout :: page(~{::content}, 'Başlık')}"` ile
+  tüm <html> dökümanını layout ile değiştirir; içeriği fragment expression ile geçer.
+-->
+<!DOCTYPE html>
+<html th:fragment="page(content, pageTitle)"
+      lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle != null ? pageTitle + ' · EgeQuiz' : 'EgeQuiz'}">EgeQuiz</title>
+    <link rel="icon" type="image/svg+xml"
+          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%236366f1'/%3E%3Cstop offset='.5' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='66' font-family='Inter,sans-serif' font-weight='800' font-size='56' text-anchor='middle' fill='white'%3EQ%3C/text%3E%3C/svg%3E"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container nav">
+        <a th:href="@{/}" class="brand">
+            <span class="brand-mark">Q</span>
+            <span>EgeQuiz<span class="brand-dot">.</span></span>
+        </a>
+
+        <nav class="nav-links" sec:authorize="isAuthenticated()">
+            <a th:href="@{/dashboard}">Panel</a>
+            <a th:href="@{/quiz}">Quizler</a>
+            <a th:href="@{/quiz/history}">Geçmişim</a>
+            <a th:href="@{/leaderboard}">Liderlik</a>
+            <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">Yönetim</a>
+        </nav>
+
+        <div class="nav-spacer"></div>
+
+        <div class="nav-actions">
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Tema değiştir" title="Tema değiştir">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+
+            <span sec:authorize="isAuthenticated()" class="user-pill"
+                  th:with="me=${#authentication.principal}">
+                <span class="avatar" th:text="${me.displayName.substring(0,1).toUpperCase()}">A</span>
+                <span th:text="${me.displayName}">Kullanıcı</span>
+            </span>
+
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn btn-ghost btn-sm">Çıkış</button>
+            </form>
+
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-ghost btn-sm">Giriş</a>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-primary btn-sm">Kayıt Ol</a>
+        </div>
+    </div>
+</header>
+
+<main class="page">
+    <div class="container">
+        <th:block th:replace="${content}"></th:block>
+    </div>
+</main>
+
+</body>
+</html>

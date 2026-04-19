@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Kategoriler')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <a th:href="@{/admin}" class="text-muted" style="font-size:.9rem">← Yönetim</a>
+        <h1 style="margin:8px 0 0">Kategoriler</h1>
+    </section>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+
+    <section style="display:grid; grid-template-columns: 1.4fr 1fr; gap:24px;">
+        <div>
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead><tr><th>İkon</th><th>Ad</th><th>Açıklama</th><th>Quiz</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="c : ${categories}">
+                        <td style="font-size:1.4rem" th:text="${c.icon}">📚</td>
+                        <td th:text="${c.name}">Ad</td>
+                        <td class="text-muted" th:text="${c.description}">--</td>
+                        <td th:text="${#lists.size(c.quizzes)}">0</td>
+                        <td>
+                            <form th:action="@{|/admin/categories/${c.id}/delete|}" method="post"
+                                  onsubmit="return confirm('Kategoriyi ve içindeki tüm quizleri silmek istediğine emin misin?')" style="margin:0">
+                                <button class="btn btn-danger btn-sm" type="submit">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(categories)}">
+                        <td colspan="5" class="text-muted text-center">Henüz kategori yok.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0">Yeni Kategori</h3>
+            <form th:action="@{/admin/categories}" method="post" class="form">
+                <div class="form-group">
+                    <label>Ad</label>
+                    <input name="name" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea name="description" class="textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>İkon</label>
+                    <input type="hidden" id="iconInput" name="icon" th:value="${iconChoices[0]}">
+                    <div class="emoji-picker" data-target="#iconInput">
+                        <button type="button"
+                                th:each="emj, it : ${iconChoices}"
+                                class="emoji-option"
+                                th:classappend="${it.index == 0} ? ' selected' : ''"
+                                th:attr="data-emoji=${emj}"
+                                th:text="${emj}">📚</button>
+                    </div>
+                    <div class="emoji-picker-current">
+                        Seçilen ikon: <span class="preview" th:text="${iconChoices[0]}">📚</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Oluştur</button>
+            </form>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

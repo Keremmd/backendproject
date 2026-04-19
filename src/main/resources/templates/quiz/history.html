@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Geçmişim')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <h1 style="margin:0">Geçmişim</h1>
+        <p class="text-muted" style="margin:0">Çözdüğün tüm quizlerin kaydı.</p>
+    </section>
+
+    <section th:if="${!#lists.isEmpty(chartAttempts)}">
+        <div class="card">
+            <h3 style="margin-top:0">Performans Trendi</h3>
+            <canvas id="trendChart" height="100"></canvas>
+        </div>
+    </section>
+
+    <section>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(attempts)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Quiz</th>
+                    <th>Kategori</th>
+                    <th>Skor</th>
+                    <th>Süre</th>
+                    <th>Tarih</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${attempts}">
+                    <td th:text="${a.quiz.title}">Quiz</td>
+                    <td>
+                        <span class="badge badge-muted">
+                            <span th:text="${a.quiz.category.icon}">📚</span>
+                            <span th:text="${a.quiz.category.name}">Kategori</span>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${a.percentage >= 70} ? 'badge-success' : (${a.percentage < 50} ? 'badge-danger' : '')"
+                              th:text="${a.score} + '/' + ${a.totalQuestions} + ' (' + ${a.percentage} + '%)'">--</span>
+                    </td>
+                    <td th:text="${a.durationSeconds} + ' sn'">0 sn</td>
+                    <td th:text="${#temporals.format(a.takenAt, 'dd.MM.yyyy HH:mm')}">--</td>
+                    <td><a th:href="@{|/quiz/result/${a.id}|}" class="btn btn-secondary btn-sm">Detay</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${#lists.isEmpty(attempts)}" class="card text-center">
+            <p class="text-muted">Henüz quiz çözmedin.</p>
+            <a th:href="@{/quiz}" class="btn btn-primary">Quiz Çöz</a>
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('trendChart');
+            if (!ctx || typeof Chart === 'undefined') return;
+            const labels = /*[[${chartAttempts.![quiz.title]}]]*/ [];
+            const data   = /*[[${chartAttempts.![percentage]}]]*/ [];
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Başarı %',
+                        data: data,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99,102,241,.15)',
+                        fill: true,
+                        tension: .35,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { suggestedMin: 0, suggestedMax: 100, ticks: { color: '#94a3b8' } },
+                        x: { ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        });
+    </script>
+
+</th:block>
+</body>
+</html>

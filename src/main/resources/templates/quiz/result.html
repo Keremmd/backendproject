@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Sonuç')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <a th:href="@{/quiz}" class="text-muted" style="font-size:.9rem">← Tüm quizler</a>
+    </section>
+
+    <section style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+        <div class="card text-center">
+            <p class="text-muted" style="margin:0" th:text="${attempt.quiz.title}">Quiz başlığı</p>
+            <h1 style="margin:6px 0 18px">Sonucun</h1>
+
+            <div class="score-ring" th:style="'--p:' + ${attempt.percentage}">
+                <div class="text">
+                    <div class="pct" th:text="${attempt.percentage} + '%'">0%</div>
+                    <div class="lbl">Başarı</div>
+                </div>
+            </div>
+
+            <div class="row gap-2 mt-3" style="justify-content:center">
+                <span class="badge badge-success">✓ <span th:text="${attempt.score} + ' Doğru'">0</span></span>
+                <span class="badge badge-danger">✗ <span th:text="${attempt.totalQuestions - attempt.score} + ' Yanlış'">0</span></span>
+                <span class="badge">⏱ <span th:text="${attempt.durationSeconds} + ' sn'">0</span></span>
+            </div>
+
+            <div class="row gap-1 mt-3" style="justify-content:center">
+                <a th:href="@{|/quiz/${attempt.quiz.id}|}" class="btn btn-secondary">Tekrar Çöz</a>
+                <a th:href="@{/quiz}" class="btn btn-ghost">Diğer Quizler</a>
+                <a th:href="@{/quiz/history}" class="btn btn-ghost">Geçmişim</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0">Performans Dağılımı</h3>
+            <canvas id="resultChart" height="220"></canvas>
+            <p class="text-muted text-center mt-2" style="font-size:.85rem">Doğru / Yanlış oranı</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title"><h2>Soru Detayları</h2></div>
+        <div class="col">
+            <div th:each="ans, it : ${attempt.answers}" class="card">
+                <div class="row spread">
+                    <div class="q-num" th:text="'Soru ' + ${it.index + 1}">Soru 1</div>
+                    <span class="badge"
+                          th:classappend="${ans.correct} ? 'badge-success' : 'badge-danger'"
+                          th:text="${ans.correct} ? '✓ Doğru' : '✗ Yanlış'">--</span>
+                </div>
+                <h4 style="margin-top:8px" th:text="${ans.question.text}">Soru metni?</h4>
+
+                <div class="col" style="gap:8px">
+                    <div th:each="opt : ${ans.question.options}"
+                         class="option"
+                         th:classappend="
+                            ${opt.correct} ? 'correct'
+                            : (${ans.selectedOption != null and ans.selectedOption.id == opt.id} ? 'wrong' : '')">
+                        <span th:text="${opt.text}">Şık</span>
+                        <span th:if="${ans.selectedOption != null and ans.selectedOption.id == opt.id}"
+                              class="text-muted" style="margin-left:auto; font-size:.8rem">(Senin cevabın)</span>
+                        <span th:if="${opt.correct and (ans.selectedOption == null or ans.selectedOption.id != opt.id)}"
+                              class="text-muted" style="margin-left:auto; font-size:.8rem">(Doğru cevap)</span>
+                    </div>
+                    <p th:if="${ans.selectedOption == null}" class="text-muted" style="font-size:.85rem; margin:4px 0 0">
+                        Bu soruyu cevapsız bıraktın.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        // Sonuç sayfası grafiği (donut)
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('resultChart');
+            if (!ctx || typeof Chart === 'undefined') return;
+            const correct = /*[[${attempt.score}]]*/ 0;
+            const wrong   = /*[[${attempt.totalQuestions - attempt.score}]]*/ 0;
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Doğru', 'Yanlış'],
+                    datasets: [{
+                        data: [correct, wrong],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: getComputedStyle(document.body).color } }
+                    }
+                }
+            });
+        });
+    </script>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Panel')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <div class="row spread">
+            <div>
+                <div class="eyebrow" style="margin-bottom:8px">Panel</div>
+                <h1 style="margin:0" th:text="${user.displayName}">Kullanıcı</h1>
+            </div>
+            <a th:href="@{/quiz}" class="btn btn-primary">Yeni quiz çöz →</a>
+        </div>
+    </section>
+
+    <section>
+        <div class="card-grid">
+            <div class="stat">
+                <span class="label">Toplam deneme</span>
+                <span class="value" th:text="${attemptCount}">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">En iyi skor</span>
+                <span class="value">
+                    <span th:text="${bestPercentage}">0</span><span style="font-size:1rem;color:var(--text-muted)">%</span>
+                </span>
+            </div>
+            <div class="stat">
+                <span class="label">Kategori</span>
+                <span class="value" th:text="${#lists.size(categories)}">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">Yeni quiz</span>
+                <span class="value" th:text="${#lists.size(recentQuizzes)}">0</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">
+            <h2>En Yeni Quizler</h2>
+            <a th:href="@{/quiz}" class="text-muted">Tümünü gör →</a>
+        </div>
+        <div class="card-grid" th:if="${!#lists.isEmpty(recentQuizzes)}">
+            <a th:each="q : ${recentQuizzes}" th:href="@{|/quiz/${q.id}|}" class="quiz-card" style="color:inherit">
+                <div class="meta">
+                    <span th:text="${q.category.icon}">📚</span>
+                    <span th:text="${q.category.name}">Kategori</span>
+                    <span>·</span>
+                    <span th:text="${#lists.size(q.questions) + ' soru'}">5 soru</span>
+                </div>
+                <h3 th:text="${q.title}">Quiz başlığı</h3>
+                <p th:text="${q.description}">Açıklama</p>
+                <div class="quiz-foot">
+                    <span class="badge">⏱ <span th:text="${q.timeLimitSeconds / 60} + ' dk'">5 dk</span></span>
+                    <span class="text-muted" style="font-size:.85rem">Başla →</span>
+                </div>
+            </a>
+        </div>
+        <p th:if="${#lists.isEmpty(recentQuizzes)}" class="text-muted">Henüz quiz yok.</p>
+    </section>
+
+    <section style="display:grid; grid-template-columns: 2fr 1fr; gap:24px;">
+        <div>
+            <div class="section-title">
+                <h2>Son Denemelerim</h2>
+                <a th:href="@{/quiz/history}" class="text-muted">Tümü →</a>
+            </div>
+            <div class="table-wrapper" th:if="${!#lists.isEmpty(recentAttempts)}">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Quiz</th>
+                        <th>Skor</th>
+                        <th>Süre</th>
+                        <th>Tarih</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="a : ${recentAttempts}">
+                        <td th:text="${a.quiz.title}">Quiz</td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${a.percentage >= 70} ? ' badge-success' : (${a.percentage < 50} ? ' badge-danger' : '')"
+                                  th:text="${a.score} + '/' + ${a.totalQuestions} + ' (' + ${a.percentage} + '%)'">
+                            </span>
+                        </td>
+                        <td th:text="${a.durationSeconds} + ' sn'">0 sn</td>
+                        <td th:text="${#temporals.format(a.takenAt, 'dd.MM.yyyy HH:mm')}">--</td>
+                        <td><a th:href="@{|/quiz/result/${a.id}|}" class="btn btn-secondary btn-sm">Detay</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p th:if="${#lists.isEmpty(recentAttempts)}" class="text-muted">Henüz quiz çözmedin. <a th:href="@{/quiz}">İlkini çöz →</a></p>
+        </div>
+
+        <div>
+            <div class="section-title"><h2 style="font-size:1.2rem">🏆 Liderlik (Top 5)</h2></div>
+            <div class="card card-tight">
+                <div th:if="${#lists.isEmpty(topPlayers)}" class="text-muted">Henüz veri yok.</div>
+                <div th:each="p, it : ${topPlayers}" class="row spread"
+                     style="padding:8px 4px; border-bottom:1px solid var(--border)">
+                    <div class="row gap-1">
+                        <span style="font-weight:700; color:var(--text-muted); width:20px" th:text="${it.index + 1}">1</span>
+                        <span class="avatar" th:text="${p.user.displayName.substring(0,1).toUpperCase()}">A</span>
+                        <span th:text="${p.user.displayName}">Kullanıcı</span>
+                    </div>
+                    <span class="badge badge-success" th:text="${p.percentage} + '%'">100%</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

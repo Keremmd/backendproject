@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, ${quiz.title})}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <div class="row spread">
+            <div>
+                <p class="text-muted" style="margin:0">
+                    <span th:text="${quiz.category.icon}">📚</span> <span th:text="${quiz.category.name}">Kategori</span>
+                </p>
+                <h1 style="margin:0" th:text="${quiz.title}">Quiz</h1>
+            </div>
+            <span id="timer" class="timer"
+                  th:attr="data-timer=${quiz.timeLimitSeconds},data-timer-form='quizForm'">⏱ --:--</span>
+        </div>
+        <div class="q-progress mt-2"><span id="quizProgressBar" style="width:0%"></span></div>
+    </section>
+
+    <section>
+        <form id="quizForm" th:action="@{|/quiz/${quiz.id}/submit|}" method="post" class="take-shell">
+
+            <div>
+                <input type="hidden" name="duration" id="duration" value="0">
+
+                <div th:each="q, it : ${quiz.questions}" class="q-block">
+                    <div class="q-num" th:text="'Soru ' + ${it.index + 1} + ' / ' + ${#lists.size(quiz.questions)}">Soru 1</div>
+                    <h4 th:text="${q.text}">Soru metni?</h4>
+
+                    <label th:each="opt : ${q.options}" class="option">
+                        <input type="radio"
+                               th:name="'q_' + ${q.id}"
+                               th:value="${opt.id}">
+                        <span th:text="${opt.text}">Şık</span>
+                    </label>
+                </div>
+
+                <div class="row spread mt-2">
+                    <a th:href="@{|/quiz/${quiz.id}|}" class="btn btn-ghost">İptal</a>
+                    <button type="submit" class="btn btn-primary btn-lg">Quizi Bitir ✓</button>
+                </div>
+            </div>
+
+            <aside>
+                <div class="card">
+                    <h3 style="font-size:1rem; margin-top:0">İpuçları</h3>
+                    <ul class="text-muted" style="margin:0; padding-left:18px; font-size:.9rem; line-height:1.7">
+                        <li>Cevap seçmediğin soru <strong>yanlış</strong> sayılır.</li>
+                        <li>Süre <strong>15 saniye</strong> kalınca sayaç kırmızıya döner.</li>
+                        <li>Süre dolunca form <strong>otomatik gönderilir</strong>.</li>
+                        <li>Sonuç sayfasında her sorunun doğru cevabını görebilirsin.</li>
+                    </ul>
+                </div>
+            </aside>
+        </form>
+    </section>
+
+</th:block>
+</body>
+</html>

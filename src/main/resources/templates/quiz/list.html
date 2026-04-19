@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Quizler')}">
+<body>
+<th:block th:fragment="content">
+
+    <section class="row spread">
+        <div>
+            <h1 style="margin:0">Quizler</h1>
+            <p class="text-muted" style="margin:0">Bir kategori seç, başarına göz at.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="row gap-1" style="flex-wrap:wrap">
+            <a th:href="@{/quiz}"
+               class="btn btn-sm"
+               th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-secondary'">Tümü</a>
+            <a th:each="c : ${categories}"
+               th:href="@{/quiz(category=${c.id})}"
+               class="btn btn-sm"
+               th:classappend="${selectedCategory != null and selectedCategory.id == c.id} ? 'btn-primary' : 'btn-secondary'">
+                <span th:text="${c.icon}">📚</span> <span th:text="${c.name}">Kategori</span>
+            </a>
+        </div>
+    </section>
+
+    <section>
+        <div class="card-grid" th:if="${!#lists.isEmpty(quizzes)}">
+            <a th:each="q : ${quizzes}" th:href="@{|/quiz/${q.id}|}" class="quiz-card" style="color:inherit">
+                <div class="meta">
+                    <span th:text="${q.category.icon}">📚</span>
+                    <span th:text="${q.category.name}">Kategori</span>
+                    <span>·</span>
+                    <span th:text="${#lists.size(q.questions) + ' soru'}">5 soru</span>
+                </div>
+                <h3 th:text="${q.title}">Quiz başlığı</h3>
+                <p th:text="${q.description}">Açıklama metni</p>
+                <div class="quiz-foot">
+                    <span class="badge">⏱ <span th:text="${q.timeLimitSeconds / 60} + ' dk'">5 dk</span></span>
+                    <span class="text-muted" style="font-size:.85rem">Çöz →</span>
+                </div>
+            </a>
+        </div>
+        <div th:if="${#lists.isEmpty(quizzes)}" class="card text-center">
+            <p class="text-muted">Bu kategoride henüz quiz yok.</p>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Sonuçlar')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <a th:href="@{/admin}" class="text-muted" style="font-size:.9rem">← Yönetim</a>
+        <h1 style="margin:8px 0 0">Tüm Quiz Denemeleri</h1>
+    </section>
+
+    <section>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(attempts)}">
+            <table class="table">
+                <thead>
+                <tr><th>Kullanıcı</th><th>Quiz</th><th>Skor</th><th>Süre</th><th>Tarih</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${attempts}">
+                    <td th:text="${a.user.displayName}">--</td>
+                    <td th:text="${a.quiz.title}">--</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${a.percentage >= 70} ? 'badge-success' : (${a.percentage < 50} ? 'badge-danger' : '')"
+                              th:text="${a.score} + '/' + ${a.totalQuestions} + ' (' + ${a.percentage} + '%)'">--</span>
+                    </td>
+                    <td th:text="${a.durationSeconds} + ' sn'">--</td>
+                    <td th:text="${#temporals.format(a.takenAt, 'dd.MM.yyyy HH:mm')}">--</td>
+                    <td><a th:href="@{|/quiz/result/${a.id}|}" class="btn btn-secondary btn-sm">Detay</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${#lists.isEmpty(attempts)}" class="card text-center">
+            <p class="text-muted">Henüz hiçbir kullanıcı quiz çözmedi.</p>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

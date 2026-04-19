@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Anasayfa')}">
+<body>
+<th:block th:fragment="content">
+
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="eyebrow">EgeQuiz · Online Quiz Platformu</div>
+            <h1>Bilgini sına,<br><span class="accent">net</span> sonuçlar gör.</h1>
+            <p>Kategoriler bazlı online quizler, geri sayım sayacı ve grafikli sonuç raporu —
+                tek bir minimalist arayüzde.</p>
+            <div class="hero-actions">
+                <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-primary">Hesap oluştur</a>
+                <a sec:authorize="!isAuthenticated()" th:href="@{/login}"   class="btn btn-secondary">Giriş yap</a>
+                <a sec:authorize="isAuthenticated()"  th:href="@{/quiz}"     class="btn btn-primary">Quizlere göz at</a>
+                <a sec:authorize="isAuthenticated()"  th:href="@{/leaderboard}" class="btn btn-secondary">Liderlik</a>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="card-grid">
+            <div class="stat">
+                <span class="label">Quiz</span>
+                <span class="value" th:text="${totalQuizzes}">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">Kategori</span>
+                <span class="value" th:text="${totalCategories}">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">Kullanıcı</span>
+                <span class="value" th:text="${totalUsers}">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">Çözülen</span>
+                <span class="value" th:text="${totalAttempts}">0</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title"><h2>Özellikler</h2><span class="text-muted">04</span></div>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Geri sayım sayacı</h3>
+                <p class="text-muted">Süre bittiğinde cevapların otomatik gönderilir.</p>
+            </div>
+            <div class="card">
+                <h3>Grafiksel sonuç</h3>
+                <p class="text-muted">Doğru/yanlış oranını ve trendini Chart.js ile takip et.</p>
+            </div>
+            <div class="card">
+                <h3>Liderlik tablosu</h3>
+                <p class="text-muted">En yüksek skor önde; eşitlikte daha kısa süre kazanır.</p>
+            </div>
+            <div class="card">
+                <h3>Yönetici paneli</h3>
+                <p class="text-muted">Kategori, quiz ve sorularını dakikalar içinde yönet.</p>
+            </div>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

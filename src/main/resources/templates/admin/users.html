@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Kullanıcılar')}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <a th:href="@{/admin}" class="text-muted" style="font-size:.9rem">← Yönetim</a>
+        <h1 style="margin:8px 0 0">Kullanıcılar</h1>
+    </section>
+
+    <section>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(users)}">
+            <table class="table">
+                <thead>
+                <tr><th>Kullanıcı adı</th><th>Ad</th><th>E-posta</th><th>Rol</th><th>Kayıt tarihi</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${users}">
+                    <td th:text="${u.username}">--</td>
+                    <td>
+                        <div class="row gap-1">
+                            <span class="avatar" th:text="${u.displayName.substring(0,1).toUpperCase()}">A</span>
+                            <span th:text="${u.displayName}">--</span>
+                        </div>
+                    </td>
+                    <td class="text-muted" th:text="${u.email}">--</td>
+                    <td>
+                        <span class="badge" th:classappend="${u.role.name() == 'ADMIN'} ? 'badge-success' : 'badge-muted'"
+                              th:text="${u.role}">USER</span>
+                    </td>
+                    <td th:text="${#temporals.format(u.createdAt, 'dd.MM.yyyy')}">--</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

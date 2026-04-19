@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, ${quiz.title})}">
+<body>
+<th:block th:fragment="content">
+
+    <section>
+        <a th:href="@{/admin/quizzes}" class="text-muted" style="font-size:.9rem">← Quizler</a>
+        <h1 style="margin:8px 0 0" th:text="${quiz.title}">Başlık</h1>
+        <p class="text-muted" style="margin:0">
+            <span th:text="${quiz.category.icon}">📚</span> <span th:text="${quiz.category.name}">Kategori</span>
+            · <span th:text="${#lists.size(quiz.questions)} + ' soru'">--</span>
+            · <span th:text="${quiz.timeLimitSeconds} + ' sn süre'">--</span>
+        </p>
+    </section>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+
+    <section>
+        <details class="card">
+            <summary style="cursor:pointer; font-weight:600">Quiz bilgilerini düzenle</summary>
+            <form th:action="@{|/admin/quizzes/${quiz.id}/update|}" method="post" class="form mt-2">
+                <div class="form-group">
+                    <label>Başlık</label>
+                    <input name="title" class="input" th:value="${quiz.title}" required>
+                </div>
+                <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea name="description" class="textarea" th:text="${quiz.description}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select name="categoryId" class="select" required>
+                        <option th:each="c : ${categories}" th:value="${c.id}"
+                                th:text="${c.icon} + ' ' + ${c.name}"
+                                th:selected="${c.id == quiz.category.id}">--</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Süre (saniye)</label>
+                    <input type="number" name="timeLimitSeconds" class="input"
+                           min="30" max="3600" th:value="${quiz.timeLimitSeconds}" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+            </form>
+        </details>
+    </section>
+
+    <section>
+        <div class="section-title"><h2>Sorular</h2></div>
+
+        <div class="col">
+            <div th:each="q, it : ${quiz.questions}" class="card">
+                <details>
+                    <summary>
+                        <strong th:text="'Soru ' + ${it.index + 1} + ':'">Soru:</strong>
+                        <span th:text="${q.text}">--</span>
+                    </summary>
+
+                    <form th:action="@{|/admin/questions/${q.id}/update|}" method="post" class="form mt-2">
+                        <div class="form-group">
+                            <label>Soru metni</label>
+                            <input name="text" class="input" th:value="${q.text}" required>
+                        </div>
+
+                        <div class="col" th:with="opts=${q.options}">
+                            <div class="form-group" th:each="i : ${#numbers.sequence(0, 3)}">
+                                <label>
+                                    <input type="radio" name="correct" th:value="${i}"
+                                           th:checked="${i < #lists.size(opts) and opts[i].correct}"> Şık
+                                    <span th:text="${'ABCD'.substring(i, i+1)}">A</span>
+                                </label>
+                                <input th:name="'opt' + ${i}" class="input"
+                                       th:value="${i < #lists.size(opts) ? opts[i].text : ''}">
+                            </div>
+                        </div>
+
+                        <div class="row gap-1">
+                            <button class="btn btn-primary btn-sm" type="submit">Kaydet</button>
+                        </div>
+                    </form>
+
+                    <hr class="divider">
+                    <form th:action="@{|/admin/questions/${q.id}/delete|}" method="post"
+                          onsubmit="return confirm('Bu soru silinsin mi?')" style="margin:0">
+                        <button class="btn btn-danger btn-sm" type="submit">Soruyu Sil</button>
+                    </form>
+                </details>
+            </div>
+            <p th:if="${#lists.isEmpty(quiz.questions)}" class="text-muted">Henüz soru yok. Aşağıdan yeni soru ekle.</p>
+        </div>
+
+        <div class="card mt-3">
+            <h3 style="margin-top:0">Yeni Soru Ekle</h3>
+            <form th:action="@{|/admin/quizzes/${quiz.id}/questions|}" method="post" class="form">
+                <div class="form-group">
+                    <label>Soru metni</label>
+                    <input name="text" class="input" required>
+                </div>
+                <div class="col">
+                    <div class="form-group" th:each="i : ${#numbers.sequence(0, 3)}">
+                        <label>
+                            <input type="radio" name="correct" th:value="${i}" th:checked="${i == 0}"> Doğru cevap olarak işaretle
+                            (Şık <span th:text="${'ABCD'.substring(i, i+1)}">A</span>)
+                        </label>
+                        <input th:name="'opt' + ${i}" class="input" th:placeholder="'Şık ' + ${'ABCD'.substring(i, i+1)}">
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Soruyu Ekle</button>
+            </form>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

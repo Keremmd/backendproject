@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::content}, 'Kayıt Ol')}">
+<body>
+<th:block th:fragment="content">
+
+    <div class="auth-shell">
+        <div class="auth-card">
+            <h1>Hesap oluştur</h1>
+            <p class="sub">Birkaç saniye içinde quiz çözmeye başla.</p>
+
+            <div th:if="${registerError}" class="alert alert-error mb-2" th:text="${registerError}"></div>
+
+            <form th:action="@{/register}" th:object="${form}" method="post" class="form">
+                <div class="form-group">
+                    <label for="username">Kullanıcı adı</label>
+                    <input id="username" th:field="*{username}" class="input" required>
+                    <span class="error-text" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="displayName">Ad Soyad</label>
+                    <input id="displayName" th:field="*{displayName}" class="input" required>
+                    <span class="error-text" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-posta</label>
+                    <input id="email" th:field="*{email}" type="email" class="input" required>
+                    <span class="error-text" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="password">Şifre</label>
+                    <input id="password" th:field="*{password}" type="password" class="input" required>
+                    <span class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                </div>
+                <button class="btn btn-primary btn-block btn-lg" type="submit">Hesabımı Oluştur</button>
+            </form>
+
+            <hr class="divider">
+            <p class="text-muted text-center" style="margin:0">
+                Zaten hesabın var mı? <a th:href="@{/login}">Giriş yap</a>
+            </p>
+        </div>
+    </div>
+
+</th:block>
+</body>
+</html>
